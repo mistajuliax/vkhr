@@ -25,8 +25,10 @@ class ShaderScript:
                      "*.comp" ]
 
     def __init__(self):
-        parser = argparse.ArgumentParser(description=self.DESCRIPTION,
-                                         usage="%(prog)s "+self.USAGE)
+        parser = argparse.ArgumentParser(
+            description=self.DESCRIPTION, usage=f"%(prog)s {self.USAGE}"
+        )
+
 
         option = parser.add_argument
 
@@ -48,16 +50,13 @@ class ShaderScript:
 
             shader_files = [  ]
 
-            contents = ""
-
-            contents = contents + "all: "
-
+            contents = "" + "all: "
             for shader_type in self.SHADER_TYPES:
                 shader_files = shader_files + glob.glob(shader_type)
 
             for shader_file in shader_files:
                 file_name, ext = os.path.splitext(shader_file)
-                contents = contents + (shader_file + ".spv ")
+                contents = f"{contents}{shader_file}.spv "
 
             contents = contents[:-1]
 
@@ -69,7 +68,7 @@ class ShaderScript:
                 dependencies, error = glslc.communicate()
 
                 command = ""
-                command = command + dependencies.decode("utf-8")
+                command += dependencies.decode("utf-8")
                 command = command + "\t"
 
                 command = command + self.GLSLC
@@ -83,9 +82,8 @@ class ShaderScript:
 
             contents = contents[:-2]
 
-            makefile = open("Makefile", "w")
-            makefile.write(contents)
-            makefile.close()
+            with open("Makefile", "w") as makefile:
+                makefile.write(contents)
 
 INIT_ERROR_STATUS = -1
 if __name__ == "__main__":
